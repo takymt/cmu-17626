@@ -1,0 +1,25 @@
+glob_matcher: doublestar
+
+commit-msg:
+  commands:
+    conventional:
+      run: ./scripts/commit-msg.sh "{1}"
+
+pre-commit:
+  parallel: true
+  commands:
+    python-lint:
+      glob: "**/*.{py,pyi}"
+      run: just lint {staged_files}
+    python-format:
+      glob: "**/*.{py,pyi}"
+      run: just fmt-check {staged_files}
+    python-types:
+      glob: "**/*.{py,pyi}"
+      run: just typecheck
+    scripts:
+      glob: "**/*.sh"
+      run: just lint-scripts {staged_files}
+    nix:
+      glob: "**/*.nix"
+      run: just fmt-check-nix {staged_files}

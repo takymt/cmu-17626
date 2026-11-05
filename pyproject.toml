@@ -1,0 +1,16 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+# The course package does not ship a py.typed marker or type stubs.
+[[tool.mypy.overrides]]
+module = ["goalmodeling", "goalmodeling.*"]
+ignore_missing_imports = true

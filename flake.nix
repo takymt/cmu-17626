@@ -9,7 +9,8 @@
     };
   };
 
-  outputs = { nixpkgs, goalmodeling, ... }:
+  outputs =
+    { nixpkgs, goalmodeling, ... }:
     let
       systems = [
         "aarch64-darwin"
@@ -20,32 +21,34 @@
       forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
-      devShells = forAllSystems (system:
+      devShells = forAllSystems (
+        system:
         let
           pkgs = import nixpkgs { inherit system; };
           python = pkgs.python312;
-          goalmodelingPackage = python.pkgs.buildPythonPackage {
-            pname = "goalmodeling";
-            version = "0.1.6";
+          goalmodelingPackage = python.pkgs.callPackage ./nix/goalmodeling.nix {
             src = goalmodeling;
-            pyproject = true;
-
-            # Upstream mixes Poetry metadata with a PEP 621 [project.urls] table, which current poetry-core rejects as incomplete metadata.
-            postPatch = ''
-              substituteInPlace pyproject.toml \
-                --replace-fail '[project.urls]' '[tool.poetry.urls]'
-            '';
-
-            build-system = [ python.pkgs.poetry-core ];
-            pythonImportsCheck = [ "goalmodeling.schema" ];
           };
         in
         {
           default = pkgs.mkShell {
             packages = [
-              (python.withPackages (_: [ goalmodelingPackage ]))
+              pkgs.just
+              pkgs.lefthook
+              pkgs.nixfmt
+              pkgs.ruff
+              pkgs.shellcheck
+              pkgs.zip
+              (python.withPackages (ps: [
+                goalmodelingPackage
+                ps.mypy
+              ]))
             ];
+            shellHook = ''
+              lefthook install
+            '';
           };
-        });
+        }
+      );
     };
 }
