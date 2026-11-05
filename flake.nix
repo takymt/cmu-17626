@@ -7,48 +7,22 @@
       url = "github:cmu-relab/goalmodeling";
       flake = false;
     };
+
+    # Flake infrastructure
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
   };
 
   outputs =
-    { nixpkgs, goalmodeling, ... }:
-    let
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ (inputs.import-tree ./modules) ];
+
       systems = [
         "aarch64-darwin"
         "x86_64-darwin"
         "aarch64-linux"
         "x86_64-linux"
       ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
-    in
-    {
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-          python = pkgs.python312;
-          goalmodelingPackage = python.pkgs.callPackage ./nix/goalmodeling.nix {
-            src = goalmodeling;
-          };
-        in
-        {
-          default = pkgs.mkShell {
-            packages = [
-              pkgs.just
-              pkgs.lefthook
-              pkgs.nixfmt
-              pkgs.ruff
-              pkgs.shellcheck
-              pkgs.zip
-              (python.withPackages (ps: [
-                goalmodelingPackage
-                ps.mypy
-              ]))
-            ];
-            shellHook = ''
-              lefthook install
-            '';
-          };
-        }
-      );
     };
 }

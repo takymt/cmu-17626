@@ -53,3 +53,8 @@ coverage.xml
 ._*
 Thumbs.db
 Desktop.ini
+
+# Dev
+.vscode/
+.local/
+
