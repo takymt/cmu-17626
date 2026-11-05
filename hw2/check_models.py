@@ -1,6 +1,6 @@
 """Check individual goal models against the assignment's structural requirements.
 
-Usage: python scripts/check_goal_models.py MODEL.py [MODEL.py ...]
+Usage: python hw2/check_models.py MODEL.py [MODEL.py ...]
 
 Each model module must expose ``build() -> (roots, links)``. Goal IDs are
 checked across all given models together, so pass only the individual

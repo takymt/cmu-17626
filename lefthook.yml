@@ -17,8 +17,11 @@ pre-commit:
     python-types:
       glob: "**/*.{py,pyi}"
       run: just typecheck
+    traceability:
+      glob: "{hw2/traceability.py,hw2/artifacts/*.{py,json}}"
+      run: just check-trace hw2
     goal-models:
-      glob: "{hw2/artifacts/goal_model_*.py,scripts/check_goal_models.py}"
+      glob: "{hw2/artifacts/goal_model_*.py,hw2/check_models.py}"
       run: just check-goals hw2
     scripts:
       glob: "**/*.sh"

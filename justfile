@@ -22,10 +22,18 @@ typecheck:
 
 # Check <assignment>'s per-transcript goal models against the requirements.
 check-goals assignment="hw2":
-    python scripts/check_goal_models.py "$1"/artifacts/goal_model_[A-Z]*.py
+    python "$1"/check_models.py "$1"/artifacts/goal_model_[A-Z]*.py
+
+# Regenerate <assignment>'s traceability matrix and missing-items list.
+trace assignment="hw2":
+    python "$1"/traceability.py
+
+# Check that <assignment>'s generated traceability files are up to date.
+check-trace assignment="hw2":
+    python "$1"/traceability.py --check
 
 # Run all Python checks without changing files.
-check: lint fmt-check typecheck check-goals
+check: lint fmt-check typecheck check-goals check-trace
 
 # Lint the specified shell scripts.
 lint-scripts +files:
