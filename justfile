@@ -20,8 +20,12 @@ fmt-check *files=".":
 typecheck:
     mypy --exclude-gitignore .
 
+# Check <assignment>'s per-transcript goal models against the requirements.
+check-goals assignment="hw2":
+    python scripts/check_goal_models.py "$1"/artifacts/goal_model_[A-Z]*.py
+
 # Run all Python checks without changing files.
-check: lint fmt-check typecheck
+check: lint fmt-check typecheck check-goals
 
 # Lint the specified shell scripts.
 lint-scripts +files:

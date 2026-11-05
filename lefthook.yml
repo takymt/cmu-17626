@@ -17,6 +17,9 @@ pre-commit:
     python-types:
       glob: "**/*.{py,pyi}"
       run: just typecheck
+    goal-models:
+      glob: "{hw2/artifacts/goal_model_*.py,scripts/check_goal_models.py}"
+      run: just check-goals hw2
     scripts:
       glob: "**/*.sh"
       run: just lint-scripts {staged_files}
