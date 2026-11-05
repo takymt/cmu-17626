@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "goalmodeling": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1731927958,
+        "narHash": "sha256-GbdKHqEC1YlTJexiEvUmPEGQh4ZFh0fEszKdLw1C51s=",
+        "owner": "cmu-relab",
+        "repo": "goalmodeling",
+        "rev": "a9fd39bceec2841e9abe723106794716dd3f9fa1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cmu-relab",
+        "repo": "goalmodeling",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1793795574,
+        "narHash": "sha256-pgG/CO+txdf2sA2z6DsM+2G3F9ajfIp/3BMC4wfKMDY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "13e53762c5afaf384d4614e94527a9ccfafe41d0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "goalmodeling": "goalmodeling",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

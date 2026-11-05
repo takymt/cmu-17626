@@ -1,0 +1,55 @@
+# Nix and direnv (keep flake.lock and .envrc tracked)
+.direnv/
+/result
+/result-*
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*$py.class
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python build and packaging output
+/build/
+/dist/
+.eggs/
+*.egg-info/
+
+# Test, type checker, and linter caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.tox/
+.nox/
+
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Local environment variables (keep example files tracked)
+.env
+.env.*
+!.env.example
+!.env.template
+!.env.*.example
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Operating system metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
