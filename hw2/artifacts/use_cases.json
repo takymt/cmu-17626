@@ -1,0 +1,177 @@
+[
+  {
+    "uc_name": "Deliver Peak Nudge",
+    "uc_id": "UC-1",
+    "actors": ["ForecastingTeam", "ProgramStaff", "Dashboard", "Customer"],
+    "pre_conditions": [
+      "The customer is assigned to the treatment group",
+      "Approved nudge templates with the required disclosures exist in the governed content library"
+    ],
+    "flow_of_events": [
+      "The forecasting team forecasts the next coincident system peak within the regulator's peak window",
+      [
+        "The dashboard drafts a nudge for each housing segment from approved templates",
+        "If the customer is a renter or has limited control, then the nudge offers only low-effort options and suggests no equipment or insulation upgrade",
+        "If the customer is a homeowner, then the nudge includes appliance and thermostat tips"
+      ],
+      [
+        "Program staff review the drafted nudge and approve, modify, or pause it",
+        "If staff pause the nudge, then it is not scheduled"
+      ],
+      [
+        "The dashboard schedules the approved nudge before the peak window",
+        "If the peak forecast is withdrawn before delivery, then the scheduled nudge is cancelled"
+      ],
+      "The dashboard records the message version, its approval, and the triggering forecast in the audit trail",
+      "The dashboard delivers the nudge to the customer on web and mobile",
+      [
+        "The customer shifts flexible load, such as laundry, dishwashing, precooling, a modest thermostat change, or EV charging, out of the peak window",
+        "If the customer dismisses or pauses nudges, then the dashboard sends no further nudges until the customer resumes them"
+      ],
+      "On the next day, the dashboard shows the customer's peak-window usage from interval data, labeled separately from the forecast-based nudge"
+    ],
+    "post_conditions": [
+      "The nudge, its approval, and its triggering forecast are recorded in the audit trail",
+      "The customer's response to the nudge is available for engagement measurement"
+    ],
+    "non_functional": [
+      "Customer-facing wording is drawn only from the approved content library",
+      "The dashboard meets WCAG 2.1 AA on mobile browsers"
+    ]
+  },
+  {
+    "uc_name": "Report Evaluated Program Impacts",
+    "uc_id": "UC-2",
+    "actors": ["ProgramStaff", "Dashboard", "SmartMeter", "Evaluator"],
+    "pre_conditions": [
+      "The regulator has published the eligible season, coincident peak hours, baseline, and weather-normalization rules",
+      "Eligible customers have been identified"
+    ],
+    "flow_of_events": [
+      "Program staff configure the evaluation period, segments, and peak window from the regulator's current definitions without changing code",
+      "The dashboard randomly assigns eligible customers to the treatment group or the holdout control group",
+      "The dashboard shows interventions only to treatment customers",
+      "Smart meters record 15-minute interval usage and transmit it to the utility the next day",
+      [
+        "The evaluator computes weather-normalized treatment-control differentials for kWh savings and coincident peak kW reduction",
+        "If interval data for a premise is missing, then the premise is handled according to the regulator's evaluation rules"
+      ],
+      "The dashboard measures engagement and satisfaction by segment and links them to measured savings",
+      [
+        "The dashboard exports an audit-ready report with participation, engagement, evaluated kWh and kW with confidence intervals, broken down by treatment status, channel, housing type, income segment, and evaluation period",
+        "If a reported segment contains fewer households than the minimum count, then its figures are suppressed"
+      ],
+      "Program staff submit the report for regulatory review"
+    ],
+    "post_conditions": [
+      "Evaluated savings and peak reduction are reported to the regulator",
+      "No individual household is identifiable in the report"
+    ],
+    "non_functional": [
+      "Reporting definitions are configurable rather than hard-coded",
+      "Individual households are not exposed in reports"
+    ]
+  },
+  {
+    "uc_name": "Estimate Bill and Explain Usage Increase",
+    "uc_id": "UC-3",
+    "actors": ["Renter", "Dashboard", "SmartMeter"],
+    "pre_conditions": [
+      "The renter has signed in to the dashboard",
+      "Interval usage to date for the current billing cycle is available"
+    ],
+    "flow_of_events": [
+      "The renter opens the usage view during the billing cycle",
+      "The dashboard shows daily kWh next to daily temperature and marks days above 125% of the trailing 30-day median",
+      "The dashboard estimates the bill from usage to date and the renter's tariff and shows it before the bill is issued",
+      [
+        "The dashboard estimates the share of the increase attributable to heating from the usage-temperature correlation",
+        "If the increase does not correlate with temperature, then the dashboard attributes it to other loads"
+      ],
+      [
+        "The dashboard shows actionable tips for usage the renter can control",
+        "If the usage is not controllable by the renter, then the dashboard offers only low-effort options and never recommends equipment or insulation changes"
+      ],
+      "The renter cuts or defers controllable loads, such as turning the heat down when away or delaying laundry, while keeping the apartment within the comfort range when home"
+    ],
+    "post_conditions": [
+      "The renter knows the estimated bill before it is issued",
+      "The renter knows how much of the increase came from heating and which loads they can control"
+    ],
+    "non_functional": [
+      "Tips never propose a heating setpoint below the renter's comfort range"
+    ]
+  },
+  {
+    "uc_name": "Detect and Resolve Meter Data Discrepancies",
+    "uc_id": "UC-4",
+    "actors": ["Homeowner", "Dashboard", "SmartMeter", "Inverter"],
+    "pre_conditions": [
+      "The homeowner's meter, inverter, battery, and charger data are connected to the dashboard",
+      "The homeowner has configured alert thresholds"
+    ],
+    "flow_of_events": [
+      "New meter interval data arrives the next day",
+      "The dashboard aligns meter, inverter, battery, and charger readings to 15-minute intervals",
+      [
+        "The dashboard checks each interval for anomalies",
+        "If a reading is absent past the delivery deadline or duplicated, then the interval is flagged as missing",
+        "If a reading is absent within the delivery deadline, then the interval is flagged as delayed",
+        "If the sources disagree or a register change is abnormal, then the interval is flagged as a mismatch"
+      ],
+      [
+        "If an issue exceeds the homeowner's urgent thresholds, then the dashboard sends a push notification",
+        "If the issue is not urgent, then the dashboard records it and groups it with related issues for later review"
+      ],
+      "The homeowner opens the flagged interval on web or mobile and sees its source, original values, and the check that triggered the flag",
+      "The homeowner downloads the raw interval records with quality flags as CSV and verifies them against the inverter logs",
+      [
+        "The homeowner marks the exception as resolved after verification",
+        "If corrected data arrives later, then the dashboard keeps the original readings and records the revision"
+      ]
+    ],
+    "post_conditions": [
+      "Each discrepancy is either resolved or remains visible as unresolved",
+      "Original readings and their revisions are preserved"
+    ],
+    "non_functional": [
+      "Related alerts are grouped so the alert stream does not become noise",
+      "Original readings are never overwritten"
+    ]
+  },
+  {
+    "uc_name": "Allocate Surplus Solar Energy",
+    "uc_id": "UC-5",
+    "actors": ["Homeowner", "Dashboard", "Inverter"],
+    "pre_conditions": [
+      "Solar production, battery state of charge, and per-interval tariff rates are available to the dashboard",
+      "The battery reserve covers the forecast load from sunset until solar output next exceeds household load"
+    ],
+    "flow_of_events": [
+      "The dashboard aligns the solar production and household demand forecasts to 15-minute intervals",
+      "The dashboard applies the tariff rate and export credit that cover each interval",
+      "The dashboard compares the outcomes of charging the EV now, delaying it, or exporting, including battery losses and the reserve, and flags a likely surplus or shortfall",
+      [
+        "If a utility peak nudge to delay EV charging is received, then the dashboard evaluates it against the surplus forecast and the vehicle's departure time",
+        "If following the nudge would forgo surplus solar or force a costlier import later, then the dashboard shows that the nudge conflicts with charging from surplus"
+      ],
+      [
+        "The homeowner applies the chosen allocation",
+        "If the homeowner charges from surplus, then the EV charges while the surplus lasts",
+        "If the homeowner follows the nudge, then EV charging is delayed out of the peak window"
+      ],
+      [
+        "The inverter stores the remaining surplus in the battery while the battery is not full",
+        "If the battery is full, then the inverter exports the remaining surplus"
+      ],
+      "The dashboard shows the resulting gross energy flows per 15-minute interval and attributes the source of EV charging"
+    ],
+    "post_conditions": [
+      "The surplus is allocated to the use the homeowner judged most valuable",
+      "The battery reserve still covers overnight and morning load"
+    ],
+    "non_functional": [
+      "Dashboard totals are reproducible from the raw interval readings"
+    ]
+  }
+]

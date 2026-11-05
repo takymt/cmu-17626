@@ -13,6 +13,7 @@ import goal_model_Jasmine
 import goal_model_Marissa
 import goal_model_Tom
 from goalmodeling.schema import (
+    Agent,
     ConflictLink,
     Goal,
     ObstructionLink,
@@ -69,8 +70,10 @@ def reachable(roots: Iterable[Any]) -> list[Any]:
 
 
 def build() -> tuple[list[Any], list[Any]]:
+    # Root order drives the layout: Marissa's goals link to both Tom's and
+    # Jasmine's, so placing her model in the middle keeps cross-model edges short.
     parts = [
-        m.build() for m in (goal_model_Marissa, goal_model_Jasmine, goal_model_Tom)
+        m.build() for m in (goal_model_Tom, goal_model_Marissa, goal_model_Jasmine)
     ]
     roots = [r for rs, _ in parts for r in rs]
     links = [link for _, ls in parts for link in ls]
@@ -97,14 +100,13 @@ def build() -> tuple[list[Any], list[Any]]:
         else:
             link.goal = swap(link.goal)
 
-    # Each model defines its own agents; unify same-named roles (Dashboard,
-    # SmartMeter) so the combined model has one node per agent.
-    agents: dict[str, Any] = {}
+    # A shared agent node becomes a hub that ~45 leaves link to, so its edges
+    # cross the whole diagram; drawing one agent node per leaf keeps each
+    # responsibility link next to its goal.
     for goal in goals.values():
         for performance in goal.performs:
-            performance.agent = agents.setdefault(
-                performance.agent.name, performance.agent
-            )
+            agent = performance.agent
+            performance.agent = Agent(agent.name, agent.type)
 
     # Tom's internal conflict G-66 vs. G-67 now reads G-66 vs. G-8 through the
     # merge: the utility wants EV charging moved out of the peak window, while
@@ -135,7 +137,24 @@ def build() -> tuple[list[Any], list[Any]]:
     return list(dict.fromkeys(swap(r) for r in roots)), links
 
 
+BOTTOM_TO_TOP = "flowchart BT\n"
+TRANSPARENT_ANNOTATION = "fill-opacity:0.0,text-align:left"
+
+
+def legible(graph: str) -> str:
+    # Bottom-to-top makes the 81-goal model ~7x wider than tall; right-to-left
+    # (roots on the left) fits one screen with fewer long edges.
+    # The library draws annotations (H/P codes) transparent with theme-colored
+    # text, which disappears on dark backgrounds; a white box keeps them legible
+    # in both light and dark viewers.
+    assert graph.startswith(BOTTOM_TO_TOP), "graph direction changed upstream"
+    assert TRANSPARENT_ANNOTATION in graph, "annotation style changed upstream"
+    return graph.replace(BOTTOM_TO_TOP, "flowchart RL\n", 1).replace(
+        TRANSPARENT_ANNOTATION, "fill:#fff,color:#000,text-align:left"
+    )
+
+
 if __name__ == "__main__":
-    graph = generate_graph(*build())
+    graph = legible(generate_graph(*build()))
     print(graph)
     print(generate_pako_link(graph))
