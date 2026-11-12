@@ -25,6 +25,7 @@ pre-commit:
       run: just check-goals hw2
     scripts:
       glob: "**/*.sh"
+      exclude: "**/.specify/**"
       run: just lint-scripts {staged_files}
     nix:
       glob: "**/*.nix"

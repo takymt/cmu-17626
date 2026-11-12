@@ -9,6 +9,7 @@
           pkgs.nixfmt
           pkgs.ruff
           pkgs.shellcheck
+          pkgs.spec-kit
           pkgs.zip
           (pkgs.python312.withPackages (ps: [
             self'.packages.goalmodeling
