@@ -1,0 +1,33 @@
+# List available tasks.
+default:
+    @just --list
+
+# Check lint rules.
+lint:
+    biome lint .
+
+# Apply formatting and safe lint fixes.
+fmt:
+    biome check --write .
+
+# Check formatting without changing files.
+fmt-check:
+    biome format .
+
+# Type-check sources and tests.
+typecheck:
+    pnpm exec tsc -p .
+
+# Run the test suite.
+test:
+    node --test "tests/**/*.test.ts"
+
+# Run all checks without changing files.
+check:
+    biome ci .
+    just typecheck
+    just test
+
+# Serve the app on http://localhost:3000.
+dev:
+    node src/web/server.ts

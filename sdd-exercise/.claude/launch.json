@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plantcare",
+      "runtimeExecutable": "nix",
+      "runtimeArgs": [
+        "develop",
+        "..",
+        "--command",
+        "bash",
+        "-c",
+        "PLANTCARE_DB=\"$(mktemp -d)/home.db\" PORT=3917 node src/web/server.ts"
+      ],
+      "port": 3917
+    }
+  ]
+}
