@@ -1,50 +1,101 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Household Plant Care Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec-First, Traceable Requirements
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+- Every feature MUST originate from a specification (`spec.md`) produced through the Spec Kit
+  workflow before any implementation begins.
+- Every functional requirement MUST carry a stable identifier (e.g., `FR-001`), and every
+  task, test, and implementation change MUST reference at least one requirement identifier.
+- Behavior not traceable to a requirement MUST NOT be implemented; it is either added to the
+  spec first or removed.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: The project exists to exercise specification-driven development; traceability is
+what makes the spec, the tests, and the code verifiably consistent with one another.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Test-First (NON-NEGOTIABLE)
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+- Tests MUST be written before the implementation they cover and MUST be observed failing
+  before the implementation is written (Red → Green → Refactor).
+- Each acceptance scenario in the spec MUST map to at least one automated test.
+- A change that adds behavior without a corresponding failing-then-passing test MUST NOT be
+  merged.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Tests derived from acceptance scenarios are the executable form of the spec and
+the primary evidence that a requirement is satisfied.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Shared Care Record Integrity
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+- Care records (plants, schedules, watering events, indoor/outdoor moves) MUST have a single
+  source of truth shared by all household members.
+- Every care event MUST record who performed it and when it occurred.
+- Recording the same care action concurrently or repeatedly MUST NOT produce silent duplicate
+  events, and an acknowledged recording MUST NOT be lost.
+- Care history MUST be append-only from the user's perspective; corrections MUST be recorded
+  as new events rather than destructive edits.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: The core problem is coordination among multiple caretakers; duplicate or missed
+care is the failure mode the system exists to prevent.
+
+### IV. Deterministic Schedule Logic
+
+- Computations of upcoming, overdue, and bring-inside status MUST be pure functions of
+  stored records, configuration, and an explicitly supplied current time.
+- Domain logic MUST NOT read the system clock; the clock MUST be injected so that tests can fix
+  time.
+- Timestamps MUST be stored in UTC or with an explicit offset, and calendar decisions MUST use
+  an explicit time zone.
+
+**Rationale**: Schedule correctness depends on time; hidden clock access and implicit time zones
+make due-date behavior untestable and nondeterministic.
+
+### V. Simplicity
+
+- The simplest design that satisfies the current spec MUST be chosen; speculative features,
+  abstractions, and extension points MUST NOT be added (YAGNI).
+- Every dependency, service, or architectural layer MUST be justified in `plan.md` against a
+  specific requirement.
+- Changes MUST be delivered in the smallest shippable unit.
+
+**Rationale**: Unrequested complexity obscures traceability and enlarges the surface that tests
+and reviewers must cover.
+
+## Technical Constraints
+
+- The implementation language is TypeScript with the compiler's `strict` mode enabled; `any`
+  MUST NOT be used without a justifying comment.
+- All project files MUST live inside `sdd-exercise/`. Files outside it MAY be changed only for
+  minimal composition with the repository (for example, declaring development dependencies in a
+  dedicated Nix module).
+- `just check`, run from `sdd-exercise/`, MUST pass before any commit; it covers linting,
+  formatting, type checking, and tests.
+- Household data MUST NOT be transmitted to third parties beyond what a requirement explicitly
+  demands.
+- Concrete framework, storage, and tooling choices are deferred to `/speckit-plan` and MUST be
+  recorded with rationale in `research.md`.
+
+## Development Workflow
+
+- Features MUST follow the Spec Kit sequence: specify → clarify (when ambiguities exist) →
+  plan → tasks → implement.
+- Ambiguities MUST be resolved through `/speckit-clarify` or by asking the stakeholder; they
+  MUST NOT be resolved by assumption.
+- Commits MUST follow Conventional Commits (enforced by the `commit-msg` hook), and each commit
+  MUST contain one logical change.
+- Before implementation, `/speckit-analyze` SHOULD be run to confirm consistency among
+  `spec.md`, `plan.md`, and `tasks.md`.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This constitution supersedes other project practices; conflicts MUST be resolved in favor of
+  this document or by amending it.
+- Amendments MUST be made through `/speckit-constitution`, MUST state their rationale, and MUST
+  update the version and Last Amended date.
+- Versioning follows semantic versioning: MAJOR for principle removals or incompatible
+  redefinitions, MINOR for new principles or materially expanded guidance, PATCH for
+  clarifications and wording fixes.
+- Every `plan.md` MUST include a Constitution Check; any violation MUST be justified in its
+  Complexity Tracking section or the plan MUST be revised.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-11-12 | **Last Amended**: 2026-11-12
